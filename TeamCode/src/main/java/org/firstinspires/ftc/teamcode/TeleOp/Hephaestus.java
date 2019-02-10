@@ -245,7 +245,7 @@ public class Hephaestus extends LinearOpMode {
 
             if (gamepad2.x) {
                 Flap.setPosition(.1);
-            } else if (gamepad2.b) {
+            } else {
                 Flap.setPosition(.37);
             }
             if (gamepad2.dpad_right) {
