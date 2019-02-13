@@ -244,10 +244,11 @@ public class Hephaestus extends LinearOpMode {
              * */
 
             if (gamepad2.x) {
-                Flap.setPosition(.1);
-            } else {
                 Flap.setPosition(.37);
+            } else {
+                Flap.setPosition(.1);
             }
+
             if (gamepad2.dpad_right) {
                 Intake.setPower(.3);
             }
@@ -260,7 +261,7 @@ public class Hephaestus extends LinearOpMode {
 
             if (RightLift.getCurrentPosition() >= -30) {
                 ArmPos = 1;
-            } else if (RightLift.getCurrentPosition() <= -5000) {
+            } else if (RightLift.getCurrentPosition() <= -6000) {
                 ArmPos = 3;
             } else {
                 ArmPos = 2;
@@ -286,7 +287,7 @@ public class Hephaestus extends LinearOpMode {
 
             if (CableSpool.getCurrentPosition() >= -5 && CableSpoolPos != 13) {
                 CableSpoolPos = 1;
-            } else if (CableSpool.getCurrentPosition() <= -3300 && CableSpoolPos != 13) { //If you find a hippo in the ocean then you will be able to destroy the earth. if you find a turtle, you will end the universe. If you find a guy with a really oversized chin you will end 50% of the multiverse
+            } else if (CableSpool.getCurrentPosition() <= -3300 && CableSpoolPos != 13) {
                 CableSpoolPos = 3;
             } else {
                 CableSpoolPos = 2;
@@ -304,16 +305,15 @@ public class Hephaestus extends LinearOpMode {
                 CableSpool.setPower(G2LY);
             }
 
-
             while (gamepad2.right_bumper) {
-                RightLift.setPower(.6);
-                LeftLift.setPower(.6);
+                RightLift.setPower(1);
+                LeftLift.setPower(1);
                 RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 RightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             }
 
-            if(gamepad2.a){
+            if (gamepad2.a) {
                 EncoderX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 EncoderX.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 EncoderY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -327,8 +327,7 @@ public class Hephaestus extends LinearOpMode {
                 getIntegratedHeading();
                 int m_MODPOSY = EncoderY.getCurrentPosition() - (int) getIntegratedHeading();
                 int m_MODPOSX = EncoderX.getCurrentPosition() - (int) getIntegratedHeading();
-                //long zAxisExtrap = ((Math.round(zAxis) ^ 2) ^ (1/2));
-                long zAxisExtrap = (int) zAxis;
+                long zAxisExtrap = Math.abs((int) zAxis);
 
                 telemetry.addData("Mod Pos Y", m_MODPOSY);
                 telemetry.addData("Mod Pos X", m_MODPOSX);
