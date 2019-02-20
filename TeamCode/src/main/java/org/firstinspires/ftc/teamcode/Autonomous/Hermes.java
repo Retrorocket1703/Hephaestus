@@ -25,17 +25,6 @@ import java.util.List;
 //Hermes is for Position 2 aka when you're facing the depot
 public class Hermes extends LinearOpMode {
 
-
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 2.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 0.7;     // Nominal speed for better accuracy.
-    static final double TURN_SPEED = 0.5;     // Nominal half speed for better accuracy.
-    static final double HEADING_THRESHOLD = 1;      // As tight as we can make it with an integer gyro
-    static final double P_TURN_COEFF = 0.1;     // Larger is more responsive, but also less stable
-    static final double P_DRIVE_COEFF = 0.15;     // Larger is more responsive, but also less stable
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
@@ -55,7 +44,6 @@ public class Hermes extends LinearOpMode {
 
         telemetry.addData("Status", "Hermes Protocol Initialized");
         telemetry.update();
-        telemetry.setAutoClear(true);
 
         //Init the IMU
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -201,6 +189,8 @@ public class Hermes extends LinearOpMode {
 
         tfod.deactivate();
 
+        //todo: I don't really know if the drop code will work right anymore? Besides it was kind of crappy to begin with. Try to find a better solution, moron.
+
         try {
             Thread.sleep(500);
         } catch (InterruptedException ex) {
@@ -217,14 +207,14 @@ public class Hermes extends LinearOpMode {
         changeMode(5);
 
         try {
-            Thread.sleep(6000);
+            Thread.sleep(200);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
 
         RightLift.setPower(-.4);
         LeftLift.setPower(-.4);
-        RightLift.setTargetPosition(-2200);
+        RightLift.setTargetPosition(-2800);
 
         BackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -232,7 +222,7 @@ public class Hermes extends LinearOpMode {
         BackRight.setPower(.2);
 
         try {
-            Thread.sleep(2500);
+            Thread.sleep(3000);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
@@ -256,15 +246,6 @@ public class Hermes extends LinearOpMode {
 
         changeMode(4);
 
-        /*while (opModeIsActive() && !isStopRequested() && xAxis >= 10) {
-            BackRight.setPower(-.6);
-            BackLeft.setPower(.6);
-            xAxis = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle;
-            telemetry.addData("Rotation x Axis", xAxis);
-            telemetry.update();
-        }*/
-
-
         ForwardLeft.setPower(.4);
         ForwardRight.setPower(.4);
         BackLeft.setPower(.4);
@@ -275,10 +256,8 @@ public class Hermes extends LinearOpMode {
         ForwardRight.setTargetPosition(400);
         ForwardLeft.setTargetPosition(400);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
+        while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
         }
 
         changeMode(1);
@@ -288,11 +267,15 @@ public class Hermes extends LinearOpMode {
         BackLeft.setTargetPosition(240);
         BackRight.setTargetPosition(-240);
 
-        try {
+        while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
+        }
+
+        /*try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-        }
+        }*/
 
         changeMode(1);
 
@@ -303,11 +286,15 @@ public class Hermes extends LinearOpMode {
         RightLift.setPower(1);
         RightLift.setTargetPosition(-1500);
 
-        try {
+        while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
+        }
+
+        /*try {
             Thread.sleep(400);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-        }
+        }*/
 
         changeMode(1);
 
@@ -316,52 +303,19 @@ public class Hermes extends LinearOpMode {
         BackLeft.setTargetPosition(-240);
         BackRight.setTargetPosition(240);
 
-        try {
+        while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
+        }
+
+        /*try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-        }
+        }*/
 
-        //changeMode(3);
-
-        /*long startTime = System.currentTimeMillis();
-        long currentTime = startTime;
-
-        while (currentTime - startTime < 5000 && opModeIsActive() && isStopRequested() != true) {
-
-            telemetry.addData("time", currentTime - startTime);
-            telemetry.addData("Status", "Returning to heading 0");
-            telemetry.update();
-
-            while (zAxis < -5) {
-                zAxis = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
-                ForwardLeft.setPower(.3);
-                ForwardRight.setPower(-.3);
-                BackLeft.setPower(.3);
-                BackRight.setPower(-.3);
-            }
-
-            while (zAxis > 5) {
-                zAxis = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
-                ForwardLeft.setPower(-.3);
-                ForwardRight.setPower(.3);
-                BackLeft.setPower(-.3);
-                BackRight.setPower(.3);
-            }
-
-            currentTime = System.currentTimeMillis();
-        }
-
-        ForwardLeft.setPower(0);
-        ForwardRight.setPower(0);
-        BackLeft.setPower(0);
-        BackRight.setPower(0);*/
-
-
-        //zAxis = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+        //Have burned through 8 seconds so far
 
         if (Position == "CENTER" || Position == "NULL") {
-
             changeMode(1);
 
             ForwardLeft.setPower(.3);
@@ -374,10 +328,8 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(250);
             BackRight.setTargetPosition(-250);
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
 
             changeMode(1);
@@ -387,10 +339,8 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(-4000);
             BackRight.setTargetPosition(-4000);
 
-            try {
-                Thread.sleep(3300);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
 
             RightLift.setPower(1);
@@ -415,10 +365,8 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(-1250);
             BackRight.setTargetPosition(1250);
 
-            try {
-                Thread.sleep(2500);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
 
             changeMode(1);
@@ -428,10 +376,8 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(-500);
             BackRight.setTargetPosition(500);
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
 
             changeMode(1);
@@ -441,10 +387,8 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(1100);
             BackRight.setTargetPosition(1100);
 
-            try {
-                Thread.sleep(1200);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
 
             changeMode(1);
@@ -454,10 +398,8 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(400);
             BackRight.setTargetPosition(-400);
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
 
             changeMode(1);
@@ -472,16 +414,14 @@ public class Hermes extends LinearOpMode {
             BackLeft.setTargetPosition(5000);
             BackRight.setTargetPosition(5000);
 
-            try {
-                Thread.sleep(7000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while(ForwardLeft.isBusy() && ForwardRight.isBusy() && BackLeft.isBusy() && BackRight.isBusy()){
+
             }
+
         }
 
 
         if (Position == "RIGHT") {
-
             changeMode(1);
 
             ForwardLeft.setPower(.3);
@@ -489,7 +429,7 @@ public class Hermes extends LinearOpMode {
             BackLeft.setPower(.3);
             BackRight.setPower(.3);
 
-            /*ForwardLeft.setTargetPosition(-300);
+            ForwardLeft.setTargetPosition(-300);
             ForwardRight.setTargetPosition(-300);
             BackLeft.setTargetPosition(-300);
             BackRight.setTargetPosition(-300);
@@ -498,7 +438,7 @@ public class Hermes extends LinearOpMode {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
-            }*/
+            }
 
             BackRight.setTargetPosition(-4000);
             ForwardLeft.setTargetPosition(-4000);
@@ -609,6 +549,7 @@ public class Hermes extends LinearOpMode {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
+
         }
 
 
@@ -620,7 +561,7 @@ public class Hermes extends LinearOpMode {
             BackLeft.setPower(.3);
             BackRight.setPower(.3);
 
-            /*ForwardLeft.setTargetPosition(-300);
+            ForwardLeft.setTargetPosition(-300);
             ForwardRight.setTargetPosition(-300);
             BackLeft.setTargetPosition(-300);
             BackRight.setTargetPosition(-300);
@@ -629,7 +570,7 @@ public class Hermes extends LinearOpMode {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
-            }*/
+            }
 
             ForwardRight.setPower(.4);
             BackLeft.setPower(.4);
@@ -643,6 +584,10 @@ public class Hermes extends LinearOpMode {
             }
 
             changeMode(1);
+
+
+            ForwardRight.setPower(.3);
+            BackLeft.setPower(.3);
 
             ForwardLeft.setTargetPosition(-300);
             ForwardRight.setTargetPosition(300);
@@ -707,44 +652,23 @@ public class Hermes extends LinearOpMode {
 
             changeMode(1);
 
-            ForwardLeft.setTargetPosition(21000);
-            ForwardRight.setTargetPosition(21000);
-            BackLeft.setTargetPosition(21000);
-            BackRight.setTargetPosition(21000);
+            ForwardLeft.setTargetPosition(10000);
+            ForwardRight.setTargetPosition(10000);
+            BackLeft.setTargetPosition(10000);
+            BackRight.setTargetPosition(10000);
 
             try {
-                Thread.sleep(4000);
+                Thread.sleep(6000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }
 
+
         telemetry.addData("Status", "Completed Detection Execution");
         telemetry.update();
 
 
-    }
-
-    public void turnToFace(double currentAngle, double desiredAngle) {
-        changeMode(3);
-        double angleBetween = desiredAngle - currentAngle;
-        double tempTurnMult = 0;
-        double turnMult = 1;
-        if (Math.sin(angleBetween) < 0) {
-            ForwardRight.setPower(Math.cos(angleBetween) < 0 ? -1 : 1);
-            ForwardLeft.setPower(Math.cos(angleBetween) < 0 ? -1 : 1);
-            BackRight.setPower(Math.cos(angleBetween) < 0 ? -1 : 1);
-            BackLeft.setPower(Math.cos(angleBetween) < 0 ? -1 : 1);
-        } else {
-            double cos = Math.cos(angleBetween);
-            tempTurnMult = Math.abs(cos) + 1;
-            double rightPow = (-tempTurnMult * turnMult * cos);
-            double leftPow = (tempTurnMult * turnMult * cos);
-            ForwardRight.setPower(rightPow);
-            ForwardLeft.setPower(leftPow);
-            BackRight.setPower(rightPow);
-            BackLeft.setPower(leftPow);
-        }
     }
 
     private void initVuforia() {
@@ -807,9 +731,59 @@ public class Hermes extends LinearOpMode {
         }
     }
 
-    public void gyroDrive(double speed,
-                          double distance,
-                          double angle) {
+    /**
+     * @param speed    can be any number UNDER 1, the lower the better
+     * @param maxThres must be equal to 1 - speed, no more or less
+     * @param distance is how far you want to move, in ticks.
+     * @param heading  is the wanted heading in degrees
+     */
+
+    /*public void driveByPID(double speed, double maxThres, int distance, double heading) {
+        //This grabs the error, and passes it the heading.
+        double error = getError(heading);
+        //This creates the proportional multiplier.
+        double multiplier = (error / 180) * maxThres;
+
+        //I forget if it works exactly like this or not. Guess we'll find you.
+
+        ForwardRight.setTargetPosition(distance);
+        BackRight.setTargetPosition(distance);
+        ForwardLeft.setTargetPosition(distance);
+        BackLeft.setTargetPosition(distance);
+
+        //The theory behind this is that it will turn like a PID would.
+        while (ForwardRight.isBusy() && BackRight.isBusy() && ForwardLeft.isBusy() && BackLeft.isBusy()) {
+            //This grabs the error, and passes it the heading.
+            error = getError(heading);
+            //This creates the proportional multiplier.
+            multiplier = (error / 180) * maxThres;
+            ForwardRight.setPower(speed - multiplier);
+            BackRight.setPower(speed - multiplier);
+            ForwardLeft.setPower(speed + multiplier);
+            BackLeft.setPower(speed + multiplier);
+        }
+
+    }
+
+    public double getError(double heading) {
+        double error;
+        error = heading - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+        return error;
+    }*/
+
+    /*
+     *  Method to drive on a fixed compass bearing (angle), based on encoder counts.
+     *  Move will stop if either of these conditions occur:
+     *  1) Move gets to the desired position
+     *  2) Driver stops the opmode running.
+     *
+     * @param speed      Target speed for forward motion.  Should allow for _/- variance for adjusting heading
+     * @param distance   Distance (in inches) to move from current position.  Negative distance means move backwards.
+     * @param angle      Absolute Angle (in Degrees) relative to last gyro reset.
+     *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
+     *                   If a relative angle is required, add/subtract from current heading.
+     *
+    public void gyroDrive(double speed, double distance, double angle) {
 
         int newLeftTarget;
         int newRightTarget;
@@ -820,7 +794,7 @@ public class Hermes extends LinearOpMode {
         double leftSpeed;
         double rightSpeed;
 
-        //todo yeah like all of this is probs broken sooooo fix it
+        //todo yeah like all of this is probs broken soooo fix it
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
@@ -872,7 +846,7 @@ public class Hermes extends LinearOpMode {
                     rightSpeed /= max;
                 }
 
-                //todo: this part is messed up to probably
+                //todo: this part is messed up too probably
 
                 ForwardLeft.setPower(rightSpeed);
                 ForwardRight.setPower(leftSpeed);
@@ -883,7 +857,7 @@ public class Hermes extends LinearOpMode {
                 telemetry.addData("Err/St", "%5.1f/%5.1f", error, steer);
                 telemetry.addData("Target", "%7d:%7d", newLeftTarget, newRightTarget);
                 telemetry.addData("Actual", "%7d:%7d" /*robot.leftDrive.getCurrentPosition(),
-                        robot.rightDrive.getCurrentPosition()*/);
+                        robot.rightDrive.getCurrentPosition());
                 telemetry.addData("Speed", "%5.2f:%5.2f", leftSpeed, rightSpeed);
                 telemetry.update();
             }
@@ -942,7 +916,7 @@ public class Hermes extends LinearOpMode {
         telemetry.addData("Speed.", "%5.2f:%5.2f", leftSpeed, rightSpeed);
 
         return onTarget;
-    }
+    }*/
 
     private double getIntegratedHeading() {
         double currentHeading = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
@@ -960,7 +934,7 @@ public class Hermes extends LinearOpMode {
         return integratedHeading;
     }
 
-    public double getError(double targetAngle) {
+    /*public double getError(double targetAngle) {
 
         double robotError;
 
@@ -973,6 +947,6 @@ public class Hermes extends LinearOpMode {
 
     public double getSteer(double error, double PCoeff) {
         return Range.clip(error * PCoeff, -1, 1);
-    }
+    }*/
 
 }

@@ -305,7 +305,7 @@ public class Hephaestus extends LinearOpMode {
                 CableSpool.setPower(G2LY);
             }
 
-            while (gamepad2.right_bumper) {
+            while (gamepad2.right_bumper && !isStopRequested()) {
                 RightLift.setPower(1);
                 LeftLift.setPower(1);
                 RightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -314,126 +314,17 @@ public class Hephaestus extends LinearOpMode {
             }
 
             if (gamepad2.a) {
-                EncoderX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                EncoderX.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                EncoderY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                EncoderY.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                PythReturn(EncoderY.getCurrentPosition(), EncoderX.getCurrentPosition());
             }
 
-            //TODO: Fix this crap
-            while (gamepad2.y) {
 
-                DriverControlled = false;
-                getIntegratedHeading();
-                int m_MODPOSY = EncoderY.getCurrentPosition() - (int) getIntegratedHeading();
-                int m_MODPOSX = EncoderX.getCurrentPosition() - (int) getIntegratedHeading();
-                long zAxisExtrap = Math.abs((int) zAxis);
-
-                telemetry.addData("Mod Pos Y", m_MODPOSY);
-                telemetry.addData("Mod Pos X", m_MODPOSX);
-                telemetry.update();
-
-                while (zAxis < -5) {
-                    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-                    zAxis = angles.firstAngle;
-                    ForwardLeft.setPower(.3);
-                    ForwardRight.setPower(-.3);
-                    BackLeft.setPower(.3);
-                    BackRight.setPower(-.3);
-                }
-
-                while (zAxis > 5) {
-                    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-                    zAxis = angles.firstAngle;
-                    ForwardLeft.setPower(-.3);
-                    ForwardRight.setPower(.3);
-                    BackLeft.setPower(-.3);
-                    BackRight.setPower(.3);
-                }
-
-                try {
-                    Thread.sleep(zAxisExtrap);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-
-                long waitfor = Math.abs(m_MODPOSX + m_MODPOSY + (int) zAxis);
-
-                while (m_MODPOSX <= -40) {
-                    ForwardLeft.setPower(-.4);
-                    ForwardRight.setPower(.4);
-                    BackLeft.setPower(.4);
-                    BackRight.setPower(-.4);
-                    m_MODPOSY = EncoderY.getCurrentPosition();
-                    m_MODPOSX = EncoderX.getCurrentPosition();
-                }
-
-                while (m_MODPOSX >= 40) {
-                    ForwardLeft.setPower(.4);
-                    ForwardRight.setPower(-.4);
-                    BackLeft.setPower(-.4);
-                    BackRight.setPower(.4);
-                    m_MODPOSY = EncoderY.getCurrentPosition();
-                    m_MODPOSX = EncoderX.getCurrentPosition();
-                }
-
-                if (m_MODPOSX <= 40 || m_MODPOSX >= -40) {
-                    ForwardLeft.setPower(0);
-                    ForwardRight.setPower(0);
-                    BackLeft.setPower(0);
-                    BackRight.setPower(0);
-                    m_MODPOSY = EncoderY.getCurrentPosition();
-                    m_MODPOSX = EncoderX.getCurrentPosition();
-                }
-
-                try {
-                    Thread.sleep(waitfor / 2);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-
-                while (m_MODPOSY <= -40) {
-                    ForwardLeft.setPower(.4);
-                    ForwardRight.setPower(.4);
-                    BackLeft.setPower(.4);
-                    BackRight.setPower(.4);
-                    m_MODPOSY = EncoderY.getCurrentPosition();
-                    m_MODPOSX = EncoderX.getCurrentPosition();
-                }
-
-                while (m_MODPOSY >= 40) {
-                    ForwardLeft.setPower(-.4);
-                    ForwardRight.setPower(-.4);
-                    BackLeft.setPower(-.4);
-                    BackRight.setPower(-.4);
-                    m_MODPOSY = EncoderY.getCurrentPosition();
-                    m_MODPOSX = EncoderX.getCurrentPosition();
-                }
-
-                if (m_MODPOSY <= 40 || m_MODPOSY >= -40) {
-                    ForwardLeft.setPower(0);
-                    ForwardRight.setPower(0);
-                    BackLeft.setPower(0);
-                    BackRight.setPower(0);
-                    m_MODPOSY = EncoderY.getCurrentPosition();
-                    m_MODPOSX = EncoderX.getCurrentPosition();
-                }
-
-                try {
-                    Thread.sleep(waitfor / 2);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-
-                ForwardLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ForwardRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                BackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
-                DriverControlled = true;
-            }
         }
+    }
+
+    public void PythReturn(int yCoord, int xCoord) {
+        double hypoLength = Math.sqrt((yCoord ^ 2) + (xCoord ^ 2));
+        double hypoAngle = Math.acos(xCoord / hypoLength);
+
     }
 
     private double getIntegratedHeading() {
